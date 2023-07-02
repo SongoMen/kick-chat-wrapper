@@ -1,5 +1,5 @@
 # Introduction
-`kickchatwrapper` is a Go package that provides a wrapper for interacting with the KickChat API. It allows you to connect to a KickChat WebSocket server, subscribe to chat channels, receive chat messages, and perform other actions related to chat functionality.
+`kickchatwrapper` is a Go package that provides a wrapper for interacting with the Kick websocket. It allows you to subscribe to chat channels and receive chat messages.
 
 # Installation
 ```
