@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 )
@@ -104,14 +105,14 @@ func (client *Client) ListenForMessages() <-chan ChatMessage {
 	return ch
 }
 
-func (client *Client) JoinChannelByID(id string) error {
+func (client *Client) JoinChannelByID(id int) error {
 	pusherSubscribe := PusherSubscribe{
 		Event: "pusher:subscribe",
 		Data: struct {
 			Channel string `json:"channel"`
 			Auth    string `json:"auth"`
 		}{
-			Channel: "chatrooms." + id + ".v2",
+			Channel: "chatrooms." + strconv.Itoa(id) + ".v2",
 			Auth:    "",
 		},
 	}
