@@ -1,4 +1,4 @@
-module kick-chat-wrapper
+module github.com/SongoMen/kick-chat-wrapper
 
 go 1.20
 
