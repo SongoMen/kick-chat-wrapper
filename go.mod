@@ -1,4 +1,4 @@
-module kick-chat-client
+module kick-chat-wrapper
 
 go 1.20
 

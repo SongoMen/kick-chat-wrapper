@@ -1,4 +1,4 @@
-package kickChatWrapper
+package kickchatwrapper
 
 import (
 	"encoding/json"
