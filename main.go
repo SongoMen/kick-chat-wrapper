@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -33,12 +34,12 @@ type ChatMessageEvent struct {
 }
 
 type ChatMessage struct {
-	ID         string `json:"id"`
-	ChatroomID int    `json:"chatroom_id"`
-	Content    string `json:"content"`
-	Type       string `json:"type"`
-	CreatedAt  string `json:"created_at"`
-	Sender     Sender `json:"sender"`
+	ID         string    `json:"id"`
+	ChatroomID int       `json:"chatroom_id"`
+	Content    string    `json:"content"`
+	Type       string    `json:"type"`
+	CreatedAt  time.Time `json:"created_at"`
+	Sender     Sender    `json:"sender"`
 }
 
 type Sender struct {
