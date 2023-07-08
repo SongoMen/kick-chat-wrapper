@@ -15,8 +15,9 @@ const (
 )
 
 type Client struct {
-	ws   *websocket.Conn
-	quit chan bool
+	ws             *websocket.Conn
+	joinedChannels []int
+	quit           chan bool
 }
 
 type PusherSubscribe struct {
@@ -73,6 +74,26 @@ func NewClient() (*Client, error) {
 	return client, err
 }
 
+func (client *Client) reconnect() error {
+	client.ws.Close()
+
+	ws, _, dialErr := websocket.DefaultDialer.Dial(APIURL, nil)
+	if dialErr != nil {
+		return dialErr
+	}
+
+	client.ws = ws
+
+	for id := range client.joinedChannels {
+		joinErr := client.JoinChannelByID(id)
+		if joinErr != nil {
+			return joinErr
+		}
+	}
+
+	return nil
+}
+
 func (client *Client) ListenForMessages() <-chan ChatMessage {
 	ch := make(chan ChatMessage)
 	go func() {
@@ -83,7 +104,16 @@ func (client *Client) ListenForMessages() <-chan ChatMessage {
 			default:
 				_, msg, err := client.ws.ReadMessage()
 				if err != nil {
-					fmt.Println("Error reading message", err)
+					if err.(*websocket.CloseError).Code == 4200 {
+						fmt.Println("Connection lost, Reconnecting...")
+						reconnectErr := client.reconnect()
+						if reconnectErr != nil {
+							fmt.Println("Error reconnecting:", reconnectErr)
+							time.Sleep(time.Second)
+						}
+					} else {
+						fmt.Println("Error reading message:", err)
+					}
 					continue
 				}
 
@@ -127,6 +157,8 @@ func (client *Client) JoinChannelByID(id int) error {
 	if err != nil {
 		return errors.New("Error joining channel")
 	}
+
+	client.joinedChannels = append(client.joinedChannels, id)
 	return nil
 }
 
