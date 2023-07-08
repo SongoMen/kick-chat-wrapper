@@ -104,7 +104,7 @@ func (client *Client) ListenForMessages() <-chan ChatMessage {
 			default:
 				_, msg, err := client.ws.ReadMessage()
 				if err != nil {
-					if err.(*websocket.CloseError).Code == 4200 {
+					if err.(*websocket.CloseError).Code == 4200 || err.(*websocket.CloseError).Code == 4201 {
 						fmt.Println("Connection lost, Reconnecting...")
 						reconnectErr := client.reconnect()
 						if reconnectErr != nil {
