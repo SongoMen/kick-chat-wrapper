@@ -75,6 +75,7 @@ func NewClient() (*Client, error) {
 }
 
 func (client *Client) reconnect() error {
+	fmt.Println("Reconnecting...")
 	client.ws.Close()
 
 	ws, _, dialErr := websocket.DefaultDialer.Dial(APIURL, nil)
