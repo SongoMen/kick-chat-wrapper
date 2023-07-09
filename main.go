@@ -110,6 +110,8 @@ func (client *Client) ListenForMessages() <-chan ChatMessage {
 					if reconnectErr != nil {
 						fmt.Println("Error reconnecting:", reconnectErr)
 						time.Sleep(time.Second * 5)
+					} else {
+						fmt.Println("Reconnected.")
 					}
 					continue
 				}
