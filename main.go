@@ -85,7 +85,7 @@ func (client *Client) reconnect() error {
 
 	client.ws = ws
 
-	for id := range client.joinedChannels {
+	for _, id := range client.joinedChannels {
 		joinErr := client.JoinChannelByID(id)
 		if joinErr != nil {
 			return joinErr
