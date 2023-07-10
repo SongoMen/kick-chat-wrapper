@@ -136,6 +136,7 @@ func (client *Client) ListenForMessages() <-chan ChatMessage {
 }
 
 func (client *Client) JoinChannelByID(id int) error {
+	fmt.Println("Joining channel", id)
 	pusherSubscribe := PusherSubscribe{
 		Event: "pusher:subscribe",
 		Data: struct {
