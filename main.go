@@ -68,8 +68,9 @@ func NewClient() (*Client, error) {
 	}
 
 	client := &Client{
-		ws:   ws,
-		quit: make(chan bool),
+		ws:             ws,
+		joinedChannels: make(map[int]bool),
+		quit:           make(chan bool),
 	}
 	return client, err
 }
