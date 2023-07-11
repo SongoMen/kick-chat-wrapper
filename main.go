@@ -18,6 +18,7 @@ type Client struct {
 	ws             *websocket.Conn
 	joinedChannels map[int]bool
 	quit           chan bool
+	debug          bool
 }
 
 type PusherSubscribe struct {
@@ -61,6 +62,13 @@ type Badge struct {
 	Count int    `json:"count"`
 }
 
+func (client *Client) printLog(msg string) {
+	if !client.debug {
+		return
+	}
+	fmt.Println(msg)
+}
+
 func NewClient() (*Client, error) {
 	ws, _, err := websocket.DefaultDialer.Dial(APIURL, nil)
 	if err != nil {
@@ -71,12 +79,13 @@ func NewClient() (*Client, error) {
 		ws:             ws,
 		joinedChannels: make(map[int]bool),
 		quit:           make(chan bool),
+		debug:          false,
 	}
 	return client, err
 }
 
 func (client *Client) reconnect() error {
-	fmt.Println("Reconnecting...")
+	client.printLog("Reconnecting...")
 	client.ws.Close()
 
 	ws, _, dialErr := websocket.DefaultDialer.Dial(APIURL, nil)
@@ -108,13 +117,13 @@ func (client *Client) ListenForMessages() <-chan ChatMessage {
 			default:
 				_, msg, err := client.ws.ReadMessage()
 				if err != nil {
-					fmt.Println("Error reading message:", err)
+					client.printLog("Error reading message: " + err.Error())
 					reconnectErr := client.reconnect()
 					if reconnectErr != nil {
-						fmt.Println("Error reconnecting:", reconnectErr)
+						client.printLog("Error reconnecting: " + reconnectErr.Error())
 						time.Sleep(time.Second * 5)
 					} else {
-						fmt.Println("Reconnected.")
+						client.printLog("Reconnected.")
 					}
 					continue
 				}
@@ -139,7 +148,7 @@ func (client *Client) ListenForMessages() <-chan ChatMessage {
 }
 
 func (client *Client) JoinChannelByID(id int) error {
-	fmt.Println("Joining channel", id)
+	client.printLog("Joining channel: " + strconv.Itoa(id))
 	if _, ok := client.joinedChannels[id]; ok {
 		return nil
 	}
@@ -167,6 +176,10 @@ func (client *Client) JoinChannelByID(id int) error {
 
 	client.joinedChannels[id] = true
 	return nil
+}
+
+func (client *Client) SetDebug(debug bool) {
+	client.debug = debug
 }
 
 func (client *Client) Close() {
