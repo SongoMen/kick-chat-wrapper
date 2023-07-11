@@ -16,7 +16,7 @@ const (
 
 type Client struct {
 	ws             *websocket.Conn
-	joinedChannels []int
+	joinedChannels map[int]bool
 	quit           chan bool
 }
 
@@ -83,9 +83,11 @@ func (client *Client) reconnect() error {
 		return dialErr
 	}
 
+	previousChannels := client.joinedChannels
 	client.ws = ws
+	client.joinedChannels = make(map[int]bool)
 
-	for _, id := range client.joinedChannels {
+	for id, _ := range previousChannels {
 		joinErr := client.JoinChannelByID(id)
 		if joinErr != nil {
 			return joinErr
@@ -137,6 +139,10 @@ func (client *Client) ListenForMessages() <-chan ChatMessage {
 
 func (client *Client) JoinChannelByID(id int) error {
 	fmt.Println("Joining channel", id)
+	if _, ok := client.joinedChannels[id]; ok {
+		return nil
+	}
+
 	pusherSubscribe := PusherSubscribe{
 		Event: "pusher:subscribe",
 		Data: struct {
@@ -158,7 +164,7 @@ func (client *Client) JoinChannelByID(id int) error {
 		return errors.New("Error joining channel")
 	}
 
-	client.joinedChannels = append(client.joinedChannels, id)
+	client.joinedChannels[id] = true
 	return nil
 }
 
